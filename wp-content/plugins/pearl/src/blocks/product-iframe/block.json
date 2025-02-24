@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "pearl/product-iframe",
+  "title": "Product Iframe",
+  "category": "embed",
+  "icon": "format-image",
+  "description": "Voegt een iframe toe met een productId als queryparameter.",
+  "keywords": [
+    "iframe",
+    "product",
+    "embed"
+  ],
+  "version": "1.0.0",
+  "attributes": {
+    "productId": {
+      "type": "string"
+    },
+    "showOfferTypeSelector": {
+      "type": "boolean",
+      "default": "true"
+    },
+    "offerType": {
+      "type": "string",
+      "default": "product"
+    }
+  },
+  "supports": {
+    "html": false
+  },
+  "editorScript": "file:./index.js"
+}
