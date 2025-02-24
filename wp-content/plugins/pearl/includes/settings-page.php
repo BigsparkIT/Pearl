@@ -14,7 +14,7 @@ add_action('admin_menu', function () {
     // Voeg het API key veld toe.
     register_setting('pearl_settings', 'pearl_orca_api_key');
     add_settings_field(
-        'pearl_orca_api_key',                        // ID van het veld.
+        'pearl_orca_api_key',                  // ID van het veld.
         __('Orca API Key', 'pearl'),           // Titel van het veld.
         function () {                          // Callback die het invoerveld rendert.
             $value = get_option('pearl_orca_api_key', '');
