@@ -16,13 +16,16 @@
     "productId": {
       "type": "string"
     },
+    "offerType": {
+      "type": "string",
+      "default": "product"
+    },
     "showOfferTypeSelector": {
       "type": "boolean",
       "default": "true"
     },
-    "offerType": {
-      "type": "string",
-      "default": "product"
+    "widgetId": {
+      "type": "string"
     }
   },
   "supports": {

@@ -5,22 +5,33 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { PanelBody, TextControl, ToggleControl, RadioControl, SelectControl } from '@wordpress/components';
 import metadata from './block.json';
 
+// Generated outside the edit function to avoid infinite change triggered looping.
+const generatedId = `bs-${Date.now() + Math.floor(Math.random() * 1000)}`;
+
+function buildIframeUrl (productId, offerType, showOfferTypeSelector, widgetId) {
+    const platformName = pearlSettings.platformName; // This is injected on the server side through wp_add_inline_script().
+
+    // const iframeUrl = 'https://starfish.staging.bigspark.it/in-article-widget' +
+    const iframeUrl = 'http://localhost:3000/in-article-widget' +
+        '?productId=' + encodeURIComponent(productId || '') +
+        '&platformName=' + encodeURIComponent(platformName) +
+        '&offerType=' + encodeURIComponent(offerType) +
+        '&showOfferTypeSelector=' + encodeURIComponent(showOfferTypeSelector) +
+        '&widgetId=' + encodeURIComponent(widgetId);
+
+    return iframeUrl;
+}
+
 registerBlockType(metadata.name, {
     edit: function Edit({ attributes, setAttributes }) {
-        const { productId, offerType, showOfferTypeSelector } = attributes;
-        const platformName = pearlSettings.platformName; // This is injected on the server side through wp_add_inline_script().
-        const widgetId = `bs-${Date.now() + Math.floor(Math.random() * 1000)}`;
+        const { productId, offerType, showOfferTypeSelector, widgetId } = attributes;
+        setAttributes({ widgetId: generatedId });
+
         setAttributes({ productId: 19299 });
 
         const [ category, setCategory ] = useState('Smartphones');
-    
-        // const iframeUrl = 'https://starfish.staging.bigspark.it/in-article-widget' +
-        const iframeUrl = 'http://localhost:3000/in-article-widget' +
-            '?productId=' + encodeURIComponent(productId || '') +
-            '&platformName=' + encodeURIComponent(platformName) +
-            '&offerType=' + encodeURIComponent(offerType) +
-            '&showOfferTypeSelector=' + encodeURIComponent(showOfferTypeSelector) +
-            '&widgetId=' + encodeURIComponent(widgetId);
+
+        const iframeUrl = buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId);
     
         return (
             <>
@@ -96,6 +107,23 @@ registerBlockType(metadata.name, {
                     </div>
                 ) }
             </>
+        );
+    },
+
+    // The save function stores the HTML in the database as backup. The primary way the content is shown is through render.php.
+    save: function Edit({ attributes }) {
+        const { productId, offerType, showOfferTypeSelector, widgetId } = attributes;
+
+        const iframeUrl = buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId);
+
+        return (
+            <div { ...useBlockProps.save() }>
+                <iframe 
+                    src={ iframeUrl }
+                    width="100%"
+                    height="1200"
+                />
+            </div>
         );
     },
 } );
