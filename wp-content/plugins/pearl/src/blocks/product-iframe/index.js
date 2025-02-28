@@ -1,14 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { registerBlockType } from '@wordpress/blocks';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl, RadioControl, SelectControl } from '@wordpress/components';
+import { PanelBody, TextControl, ToggleControl, RadioControl, SelectControl, Button } from '@wordpress/components';
 import metadata from './block.json';
 
 // Generated outside the edit function to avoid infinite change triggered looping.
 const generatedId = `bs-${Date.now() + Math.floor(Math.random() * 1000)}`;
 
-function buildIframeUrl (productId, offerType, showOfferTypeSelector, widgetId) {
+// WIP fetch is not yet possible so mock data is generated with a timeout to make it async.
+async function retrieveProducts(category, search) {
+    // const apiUrl = 'https://orca.staging.bigspark.it/api/graphql-hub';
+    // const body = `{ productSearch(query: "${search}", category: "${category}", limit: 10) { id, brand, name } }`;
+
+    await new Promise(r => setTimeout(r, 500));
+    return [
+        { id: 19299, brand: 'Real', name: 'Phone' },
+        { id: 1 + Math.floor(Math.random()*1000), brand: 'Fake', name: 'One' },
+        { id: 1 + Math.floor(Math.random()*1000), brand: 'Fake', name: 'Two' },
+        { id: 1 + Math.floor(Math.random()*1000), brand: 'Fake', name: 'Three' },
+        { id: 1 + Math.floor(Math.random()*1000), brand: 'Fake', name: 'Four' },
+    ];
+}
+
+function buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId) {
     const platformName = pearlSettings.platformName; // This is injected on the server side through wp_add_inline_script().
 
     // const iframeUrl = 'https://starfish.staging.bigspark.it/in-article-widget' +
@@ -27,9 +42,31 @@ registerBlockType(metadata.name, {
         const { productId, offerType, showOfferTypeSelector, widgetId } = attributes;
         setAttributes({ widgetId: generatedId });
 
-        setAttributes({ productId: 19299 });
+        const [category, setCategory] = useState('Smartphones');
+        const [search, setSearch] = useState('');
+        const [loading, setLoading] = useState(false);
+        const [isOpen, setIsOpen] = useState(false);
+        const [products, setProducts] = useState([]);
+        const [selectedProduct, setSelectedProduct] = useState(undefined);
 
-        const [ category, setCategory ] = useState('Smartphones');
+        useEffect(() => {
+            (async () => {
+                if (! search) {
+                    return;
+                }
+                setLoading(true);
+                const data = await retrieveProducts(category, search);
+                setProducts(data);
+                setIsOpen(true);
+                setLoading(false);
+            })();
+        }, [search, category]);
+
+        useEffect(() => {
+            if (selectedProduct) {
+                setAttributes({ productId: selectedProduct.id });
+            }
+        }, [selectedProduct]);
 
         const iframeUrl = buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId);
     
@@ -37,6 +74,12 @@ registerBlockType(metadata.name, {
             <>
                 <InspectorControls>
                     <PanelBody title={ __('Settings', 'pearl') }>
+                        { selectedProduct && (
+                            <>
+                                <p>{ __('Geselecteerd product:', 'pearl') }</p>
+                                <p style={ { fontWeight: 'bold', fontSize: 'large' } }>{ selectedProduct.brand } { selectedProduct.name }</p>
+                            </>
+                        ) }
                         <SelectControl
                             __nextHasNoMarginBottom
                             __next40pxDefaultSize
@@ -85,20 +128,39 @@ registerBlockType(metadata.name, {
                         <TextControl
                             __nextHasNoMarginBottom
                             __next40pxDefaultSize
-                            label={ __('Product ID', 'pearl') }
-                            value={ productId || '' }
-                            placeholder={ __('Voer product ID in...', 'pearl') }
-                            onChange={ (value) => setAttributes({ productId: value }) }
+                            label={ __('Zoek naar product', 'pearl') }
+                            value={ search }
+                            onChange={ (value) => setSearch(value) }
                         />
+                        { isOpen && (
+                            <ul>
+                                { loading && (<li>Producten laden</li>) }
+                                { !loading && (
+                                    products.map((product) =>
+                                        <li key={ product.id }>
+                                            <Button
+                                                __next40pxDefaultSize
+                                                variant='secondary'
+                                                style={ { width: '100%', textAlign: 'left' } }
+                                                onClick={ () => {
+                                                    setSelectedProduct(product);
+                                                    setIsOpen(false);
+                                                } }
+                                            >{ product.brand } { product.name }</Button>
+                                        </li>
+                                    )
+                                ) }
+                            </ul>
+                        ) }
                     </PanelBody>
                 </InspectorControls>
     
                 { !productId && (
-                    <p { ...useBlockProps() }>{ __('Fill in a product ID to see a preview', 'pearl') }</p>
+                    <p { ...useBlockProps() }>{ __('Zoek en selecteer een product om een preview te zien', 'pearl') }</p>
                 ) }
                 { productId && (
                     <div { ...useBlockProps() }>
-                        <p>{ __('Preview:', 'pearl') + iframeUrl }</p>
+                        <p>{ __('Preview:', 'pearl') }</p>
                         <iframe 
                             src={ iframeUrl }
                             width="100%"
