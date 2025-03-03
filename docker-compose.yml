@@ -1,0 +1,41 @@
+services:
+
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: plugindb
+    volumes:
+      - .:/var/www/html
+
+  db:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: plugindb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+  node:
+    image: node
+    container_name: node
+    restart: always
+    working_dir: /var/www/html/wp-content/plugins/pearl
+    volumes:
+      - .:/var/www/html
+    command: sleep infinity # Houd de container actief zodat je handmatig npm kunt uitvoeren
+
+volumes:
+  wordpress:
+  db:
+  node:
