@@ -20,7 +20,7 @@ async function retrieveProducts(category, search) {
 function buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId) {
     const platformName = pearlSettings.platformName; // This is injected on the server side through wp_add_inline_script().
 
-    const iframeUrl = 'https://starfish.production.bigspark.it/in-article-widget' +
+    const iframeUrl = 'https://wl.bigspark.link/in-article-widget/' +
         '?productId=' + encodeURIComponent(productId || '') +
         '&platformName=' + encodeURIComponent(platformName) +
         '&offerType=' + encodeURIComponent(offerType) +

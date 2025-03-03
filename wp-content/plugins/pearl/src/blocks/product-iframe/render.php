@@ -6,7 +6,7 @@ function encodeURIComponent($str) {
 }
 
 if (! empty($attributes['productId']) && ! empty($attributes['offerType']) && ! empty($attributes['widgetId'])) {
-    $iframeUrl = 'https://starfish.production.bigspark.it/in-article-widget' +
+    $iframeUrl = 'https://wl.bigspark.link/in-article-widget/' +
         '?productId=' + encodeURIComponent($attributes['productId']) +
         '&platformName=' + encodeURIComponent(get_option('pearl_platform_identifier', '')) +
         '&offerType=' + encodeURIComponent($attributes['offerType']) +
