@@ -11,19 +11,6 @@ if (! defined('ABSPATH')) {
  * Registreer de instellingen en voeg de benodigde velden toe.
  */
 add_action('admin_menu', function () {
-    // Voeg het API key veld toe.
-    register_setting('pearl_settings', 'pearl_orca_api_key');
-    add_settings_field(
-        'pearl_orca_api_key',                  // ID van het veld.
-        __('Orca API Key', 'pearl'),           // Titel van het veld.
-        function () {                          // Callback die het invoerveld rendert.
-            $value = get_option('pearl_orca_api_key', '');
-            echo '<input type="text" name="pearl_orca_api_key" value="' . esc_attr($value) . '" class="regular-text" />';
-        },
-        'pearl',                               // Pagina slug.
-        'pearl_settings_section'               // Sectie waarin het veld getoond wordt.
-    );
-
     // Voeg het Platform Identifier veld toe.
     register_setting('pearl_settings', 'pearl_platform_identifier');
     add_settings_field(
