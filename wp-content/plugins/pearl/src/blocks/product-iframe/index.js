@@ -155,10 +155,16 @@ registerBlockType(metadata.name, {
                 { productId && (
                     <div { ...useBlockProps() }>
                         <p>{ __('Preview:', 'pearl') }</p>
-                        <iframe 
+                        <script src='https://wl.bigspark.link/assets/resize-iframe.js'></script>
+                        <iframe
+                            id={ widgetId }
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            class="bs-widget"
+                            style={ { border: "none" } }
                             src={ iframeUrl }
                             width="100%"
-                            height="1200"
+                            height="750"
                         />
                     </div>
                 ) }
@@ -174,10 +180,16 @@ registerBlockType(metadata.name, {
 
         return (
             <div { ...useBlockProps.save() }>
-                <iframe 
+                <script src='https://wl.bigspark.link/assets/resize-iframe.js'></script>
+                <iframe
+                    id={ widgetId }
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    class="bs-widget"
+                    style={ { border: "none" } }
                     src={ iframeUrl }
                     width="100%"
-                    height="1200"
+                    height="750"
                 />
             </div>
         );
