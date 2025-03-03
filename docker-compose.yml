@@ -28,6 +28,7 @@ services:
 
   node:
     image: node
+    container_name: node
     restart: always
     working_dir: /var/www/html/wp-content/plugins/pearl
     volumes:
