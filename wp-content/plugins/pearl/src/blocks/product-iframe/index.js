@@ -8,26 +8,19 @@ import metadata from './block.json';
 // Generated outside the edit function to avoid infinite change triggered looping.
 const generatedId = `bs-${Date.now() + Math.floor(Math.random() * 1000)}`;
 
-// WIP fetch is not yet possible so mock data is generated with a timeout to make it async.
 async function retrieveProducts(category, search) {
-    // const apiUrl = 'https://orca.staging.bigspark.it/api/graphql-hub';
-    // const body = `{ productSearch(query: "${search}", category: "${category}", limit: 10) { id, brand, name } }`;
+    const apiUrl = 'https://orca.production.bigspark.it/api/graphql-hub';
+    const query = `{productSearch(query:"${search}",category:"${category}",limit:10){id,brand,name}}`;
 
-    await new Promise(r => setTimeout(r, 500));
-    return [
-        { id: 19299, brand: 'Real', name: 'Phone' },
-        { id: 1 + Math.floor(Math.random()*1000), brand: 'Fake', name: 'One' },
-        { id: 1 + Math.floor(Math.random()*1000), brand: 'Fake', name: 'Two' },
-        { id: 1 + Math.floor(Math.random()*1000), brand: 'Fake', name: 'Three' },
-        { id: 1 + Math.floor(Math.random()*1000), brand: 'Fake', name: 'Four' },
-    ];
+    const { data } = await fetch(apiUrl + '?query=' + query).then(result => result.json());
+
+    return data.productSearch;
 }
 
 function buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId) {
     const platformName = pearlSettings.platformName; // This is injected on the server side through wp_add_inline_script().
 
-    // const iframeUrl = 'https://starfish.staging.bigspark.it/in-article-widget' +
-    const iframeUrl = 'http://localhost:3000/in-article-widget' +
+    const iframeUrl = 'https://starfish.production.bigspark.it/in-article-widget' +
         '?productId=' + encodeURIComponent(productId || '') +
         '&platformName=' + encodeURIComponent(platformName) +
         '&offerType=' + encodeURIComponent(offerType) +
@@ -97,6 +90,7 @@ registerBlockType(metadata.name, {
                             ] }
                             onChange={ function(value) {
                                 setCategory(value);
+                                setProducts([]);
                                 if (value !== 'Smartphones') {
                                     setAttributes({ offerType: 'product' })
                                 }
