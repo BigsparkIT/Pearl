@@ -14,7 +14,7 @@
   "version": "1.0.0",
   "attributes": {
     "productId": {
-      "type": "string"
+      "type": "integer"
     },
     "offerType": {
       "type": "string",
