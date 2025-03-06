@@ -67,10 +67,15 @@ registerBlockType(metadata.name, {
             <>
                 <InspectorControls>
                     <PanelBody title={ __('Settings', 'pearl') }>
-                        { selectedProduct && (
+                        { (selectedProduct || productId) && (
                             <>
                                 <p>{ __('Geselecteerd product:', 'pearl') }</p>
-                                <p style={ { fontWeight: 'bold', fontSize: 'large' } }>{ selectedProduct.brand } { selectedProduct.name }</p>
+                                { selectedProduct && (
+                                    <p style={ { fontWeight: 'bold', fontSize: 'large' } }>{ selectedProduct.brand } { selectedProduct.name }</p>
+                                ) }
+                                { !selectedProduct && (
+                                    <p style={ { fontWeight: 'bold', fontSize: 'large' } }>{ __('Product met ID', 'pearl') } { productId }</p>
+                                ) }
                             </>
                         ) }
                         <SelectControl
