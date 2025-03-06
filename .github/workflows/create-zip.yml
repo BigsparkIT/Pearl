@@ -1,0 +1,31 @@
+name: Build release zip
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    name: Build release zip
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: wp-content/plugins/pearl
+    steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Build Zip
+      run: |
+        npm install
+        npm run build
+        npm run plugin-zip
+
+    - name: Upload release zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: BigSpark-Pearl
+        path: wp-content/plugins/pearl/pearl.zip
