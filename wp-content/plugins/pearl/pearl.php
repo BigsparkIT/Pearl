@@ -2,7 +2,7 @@
 /**
  * Plugin Name: BigSpark Pearl
  * Description: Voegt een Gutenberg block toe om een in-article-widget te maken.
- * Version: 1.0.0
+ * Version: 0.1.0
  * Author: BigSpark
  * Author URI: https://bigspark.com
  * License: GPL2+
