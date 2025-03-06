@@ -36,8 +36,8 @@ add_action('admin_menu', function () {
 
     // Voeg een instellingenpagina toe aan het admin menu.
     add_options_page(
-        __('Pearl Instellingen', 'pearl'),     // Paginatitel.
-        __('Pearl', 'pearl'),                  // Menutitel.
+        __('BigSpark Pearl Instellingen', 'pearl'),     // Paginatitel.
+        __('BigSpark Pearl', 'pearl'),                  // Menutitel.
         'manage_options',                      // Vereiste rechten.
         'pearl-settings',                      // Menu slug.
         function () {                          // Callback functie voor de pagina.

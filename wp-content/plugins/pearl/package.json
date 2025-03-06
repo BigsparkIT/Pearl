@@ -1,7 +1,7 @@
 {
 	"name": "pearl",
 	"version": "1.0.0",
-	"description": "Voegt een iframe toe met een productId als queryparameter.",
+	"description": "Voegt een Gutenberg block toe om een in-article-widget te maken.",
 	"author": "BigSpark",
 	"license": "GPL2+",
 	"main": "build/index.js",
