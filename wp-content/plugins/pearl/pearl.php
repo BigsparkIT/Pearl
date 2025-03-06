@@ -9,18 +9,17 @@
  * Text Domain: pearl
  */
 
+ 
+// This stops directly calling the code.
 if (! defined('ABSPATH')) {
-    exit; // Voorkom directe toegang.
+    exit;
 }
 
-/**
- * Plugin initialisatie.
- */
 add_action('init', function () {
     register_block_type(__DIR__ . '/build/blocks/product-iframe');
 });
 
-// Laad de settings-page code enkel in de admin omgeving.
+// Only load the settings page and inject the the platform name in the admin environment.
 if (is_admin()) {
     require_once plugin_dir_path(__FILE__) . 'includes/settings-page.php';
 

@@ -1,46 +1,47 @@
 <?php
 /**
- * Instellingenpagina voor de Pearl plugin.
+ * Settings page for the Pearl plugin.
  */
 
+// This stops directly calling the code.
 if (! defined('ABSPATH')) {
-    exit; // Voorkom directe toegang.
+    exit;
 }
 
 /**
- * Registreer de instellingen en voeg de benodigde velden toe.
+ * Register the settings and add the setting field.
  */
 add_action('admin_menu', function () {
-    // Voeg het Platform Identifier veld toe.
+    // Add the Platform Identifier field.
     register_setting('pearl_settings', 'pearl_platform_identifier');
     add_settings_field(
-        'pearl_platform_identifier',           // ID van het veld.
-        __('Platform Identifier', 'pearl'),    // Titel van het veld.
-        function () {                          // Callback die het invoerveld rendert.
+        'pearl_platform_identifier',                // ID of the field.
+        __('Platform Identifier', 'pearl'),         // Title of the field.
+        function () {                               // Callback that renders the input field.
             $value = get_option('pearl_platform_identifier', '');
             echo '<input type="text" name="pearl_platform_identifier" value="' . esc_attr($value) . '" class="regular-text" />';
         },
-        'pearl',                               // Pagina slug.
-        'pearl_settings_section'               // Sectie waarin het veld getoond wordt.
+        'pearl',                                    // Page slug the field is connected to.
+        'pearl_settings_section'                    // Section where the field is shown.
     );
 
-    // Voeg een instellingen sectie toe.
+    // Add the settings section
     add_settings_section(
-        'pearl_settings_section',              // ID van de sectie.
-        __('Algemene Instellingen', 'pearl'),  // Titel van de sectie.
-        function () {                          // Callback voor extra uitleg.
+        'pearl_settings_section',                   // ID of the section.
+        __('Algemene Instellingen', 'pearl'),       // Title of the section.
+        function () {                               // Callback that renders extra information under the title.
             echo '<p>' . esc_html__('Vul hier de algemene instellingen in voor Pearl.', 'pearl') . '</p>';
         },
-        'pearl'                                // Pagina slug waar de sectie aan gekoppeld wordt.
+        'pearl'                                     // Page slug the section is connected to.
     );
 
-    // Voeg een instellingenpagina toe aan het admin menu.
+    // Add the settings page to the admin menu.
     add_options_page(
-        __('BigSpark Pearl Instellingen', 'pearl'),     // Paginatitel.
-        __('BigSpark Pearl', 'pearl'),                  // Menutitel.
-        'manage_options',                      // Vereiste rechten.
-        'pearl-settings',                      // Menu slug.
-        function () {                          // Callback functie voor de pagina.
+        __('BigSpark Pearl Instellingen', 'pearl'), // Page title.
+        __('BigSpark Pearl', 'pearl'),              // Menu title.
+        'manage_options',                           // Required permission.
+        'pearl-settings',                           // Menu slug.
+        function () {                               // Callback function that renders the settings page.
             ?>
             <div class="wrap">
                 <h1><?php esc_html_e('Pearl Instellingen', 'pearl'); ?></h1>

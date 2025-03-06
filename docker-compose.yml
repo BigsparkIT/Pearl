@@ -33,7 +33,7 @@ services:
     working_dir: /var/www/html/wp-content/plugins/pearl
     volumes:
       - .:/var/www/html
-    command: sleep infinity # Houd de container actief zodat je handmatig npm kunt uitvoeren
+    command: sleep infinity # Keeps the container active so you kan run npm commands.
 
 volumes:
   wordpress:
