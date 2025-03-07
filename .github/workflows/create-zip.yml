@@ -22,23 +22,11 @@ jobs:
         npm run build
         npm run plugin-zip
 
-    - name: Get release
-      id: get_release
-      uses: bruceadams/get-release@v1.3.2
-    
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
+    - name: Unzip the archive (prevents double zip problem)
+      run: unzip wp-content/plugins/pearl/pearl.zip -d zipfile
+
+    - name: Upload release zip
+      uses: actions/upload-artifact@v4
       with:
-        upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: wp-content/plugins/pearl/pearl.zip
-        asset_name: BigSpark-Pearl.zip
-        asset_content_type: application/zip
-
-    # - name: Unzip the archive (prevents double zip problem)
-    #   run: unzip wp-content/plugins/pearl/pearl.zip -d zipfile
-
-    # - name: Upload release zip
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: BigSpark-Pearl
-    #     path: zipfile
+        name: BigSpark-Pearl
+        path: zipfile
