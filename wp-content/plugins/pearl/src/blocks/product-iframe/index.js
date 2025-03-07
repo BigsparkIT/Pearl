@@ -69,29 +69,29 @@ registerBlockType(metadata.name, {
                     <PanelBody title={__('Settings', 'pearl')}>
                         {(selectedProduct || productId) && (
                             <>
-                                <p>{__('Geselecteerd product:', 'pearl')}</p>
+                                <p>{__('Selected product:', 'pearl')}</p>
                                 {selectedProduct && (
                                     <p style={{fontWeight: 'bold', fontSize: 'large'}}>{selectedProduct.brand} {selectedProduct.name}</p>
                                 )}
                                 {!selectedProduct && (
-                                    <p style={{fontWeight: 'bold', fontSize: 'large'}}>{__('Product met ID', 'pearl')} {productId}</p>
+                                    <p style={{fontWeight: 'bold', fontSize: 'large'}}>{__('Product with ID', 'pearl')} {productId}</p>
                                 )}
                             </>
                         )}
                         <SelectControl
                             __nextHasNoMarginBottom
                             __next40pxDefaultSize
-                            label={__('Categorie', 'pearl')}
+                            label={__('Category', 'pearl')}
                             value={category}
                             options={[
-                                {label: 'Smartphones', value: 'Smartphones'},
-                                {label: 'Smartwatches', value: 'Smartwatches'},
-                                {label: 'PCs', value: 'PCs'},
-                                {label: 'Laptops', value: 'Laptops'},
-                                {label: 'Mediaspelers', value: 'Mediaspelers'},
-                                {label: 'Mp3', value: 'Mp3'},
-                                {label: 'Oordopjes', value: 'Oordopjes'},
-                                {label: 'Tablets', value: 'Tablets'},
+                                {label: __('Smartphones', 'pearl'), value: 'Smartphones'},
+                                {label: __('Smartwatches', 'pearl'), value: 'Smartwatches'},
+                                {label: __('PCs', 'pearl'), value: 'PCs'},
+                                {label: __('Laptops', 'pearl'), value: 'Laptops'},
+                                {label: __('Mediaplayers', 'pearl'), value: 'Mediaspelers'},
+                                {label: __('Mp3', 'pearl'), value: 'Mp3'},
+                                {label: __('Earplugs', 'pearl'), value: 'Oordopjes'},
+                                {label: __('Tablets', 'pearl'), value: 'Tablets'},
                             ]}
                             onChange={function(value) {
                                 setCategory(value);
@@ -118,7 +118,7 @@ registerBlockType(metadata.name, {
                                     __nextHasNoMarginBottom
                                     __next40pxDefaultSize
                                     checked={!!showOfferTypeSelector}
-                                    label={__('Maak het mogelijk om te switchen van offer type?', 'pearl')}
+                                    label={__('Make it possible to switch between offer types?', 'pearl')}
                                     onChange={() => setAttributes({showOfferTypeSelector: !showOfferTypeSelector})
                                     }
                                 />
@@ -127,7 +127,7 @@ registerBlockType(metadata.name, {
                         <TextControl
                             __nextHasNoMarginBottom
                             __next40pxDefaultSize
-                            label={__('Zoek naar product', 'pearl')}
+                            label={__('Search a product', 'pearl')}
                             value={search}
                             onChange={(value) => setSearch(value)}
                         />
@@ -155,7 +155,7 @@ registerBlockType(metadata.name, {
                 </InspectorControls>
     
                 {!productId && (
-                    <p {...useBlockProps()}>{__('Zoek en selecteer een product om een preview te zien', 'pearl')}</p>
+                    <p {...useBlockProps()}>{__('Search and select a product to see a preview', 'pearl')}</p>
                 )}
                 {productId && (
                     <div {...useBlockProps()}>

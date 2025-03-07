@@ -26,15 +26,15 @@ add_action('admin_menu', function () {
 
     add_settings_section(
         id: 'pearl_settings_section',
-        title: __('Algemene Instellingen', 'pearl'),
+        title: __('General settings', 'pearl'),
         callback: function () {
-            echo '<p>' . esc_html__('Vul hier de algemene instellingen in voor Pearl.', 'pearl') . '</p>';
+            echo '<p>' . esc_html__('Enter general settings for Pearl here.', 'pearl') . '</p>';
         },
         page: 'pearl'
     );
 
     add_options_page(
-        page_title: __('BigSpark Pearl Instellingen', 'pearl'),
+        page_title: __('BigSpark Pearl settings', 'pearl'),
         menu_title: __('BigSpark Pearl', 'pearl'),
         capability: 'manage_options',
         menu_slug: 'pearl-settings',

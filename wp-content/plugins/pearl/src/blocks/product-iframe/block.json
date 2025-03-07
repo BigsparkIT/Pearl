@@ -5,7 +5,7 @@
   "title": "Product Iframe",
   "category": "embed",
   "icon": "format-image",
-  "description": "Voegt een iframe toe met een in-article-widget.",
+  "description": "Adds an iframe containing an in-article-widget.",
   "keywords": [
     "iframe",
     "product",
