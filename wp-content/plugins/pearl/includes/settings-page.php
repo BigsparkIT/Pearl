@@ -3,7 +3,6 @@
  * Settings page for the Pearl plugin.
  */
 
-// This stops directly calling the code.
 if (! defined('ABSPATH')) {
     exit;
 }
