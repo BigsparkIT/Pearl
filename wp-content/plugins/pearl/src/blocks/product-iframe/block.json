@@ -5,16 +5,16 @@
   "title": "Product Iframe",
   "category": "embed",
   "icon": "format-image",
-  "description": "Voegt een iframe toe met een productId als queryparameter.",
+  "description": "Adds an iframe containing an in-article-widget.",
   "keywords": [
     "iframe",
     "product",
     "embed"
   ],
-  "version": "1.0.0",
+  "version": "0.1.0",
   "attributes": {
     "productId": {
-      "type": "string"
+      "type": "integer"
     },
     "offerType": {
       "type": "string",
@@ -31,5 +31,6 @@
   "supports": {
     "html": false
   },
-  "editorScript": "file:./index.js"
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
 }

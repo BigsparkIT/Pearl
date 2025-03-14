@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { __ } from '@wordpress/i18n';
-import { registerBlockType } from '@wordpress/blocks';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl, RadioControl, SelectControl, Button } from '@wordpress/components';
+import {useState, useEffect} from 'react';
+import {__} from '@wordpress/i18n';
+import {registerBlockType} from '@wordpress/blocks';
+import {InspectorControls, useBlockProps} from '@wordpress/block-editor';
+import {PanelBody, TextControl, ToggleControl, RadioControl, SelectControl, Button} from '@wordpress/components';
 import metadata from './block.json';
 
 // Generated outside the edit function to avoid infinite change triggered looping.
@@ -12,7 +12,7 @@ async function retrieveProducts(category, search) {
     const apiUrl = 'https://orca.production.bigspark.it/api/graphql-hub';
     const query = `{productSearch(query:"${search}",category:"${category}",limit:10){id,brand,name}}`;
 
-    const { data } = await fetch(apiUrl + '?query=' + query).then(result => result.json());
+    const {data} = await fetch(apiUrl + '?query=' + query).then(result => result.json());
 
     return data.productSearch;
 }
@@ -31,9 +31,9 @@ function buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId) {
 }
 
 registerBlockType(metadata.name, {
-    edit: function Edit({ attributes, setAttributes }) {
-        const { productId, offerType, showOfferTypeSelector, widgetId } = attributes;
-        setAttributes({ widgetId: generatedId });
+    edit: function Edit({attributes, setAttributes}) {
+        const {productId, offerType, showOfferTypeSelector, widgetId} = attributes;
+        setAttributes({widgetId: generatedId});
 
         const [category, setCategory] = useState('Smartphones');
         const [search, setSearch] = useState('');
@@ -57,7 +57,7 @@ registerBlockType(metadata.name, {
 
         useEffect(() => {
             if (selectedProduct) {
-                setAttributes({ productId: selectedProduct.id });
+                setAttributes({productId: selectedProduct.id});
             }
         }, [selectedProduct]);
 
@@ -66,128 +66,133 @@ registerBlockType(metadata.name, {
         return (
             <>
                 <InspectorControls>
-                    <PanelBody title={ __('Settings', 'pearl') }>
-                        { selectedProduct && (
+                    <PanelBody title={__('Settings', 'pearl')}>
+                        {(selectedProduct || productId) && (
                             <>
-                                <p>{ __('Geselecteerd product:', 'pearl') }</p>
-                                <p style={ { fontWeight: 'bold', fontSize: 'large' } }>{ selectedProduct.brand } { selectedProduct.name }</p>
+                                <p>{__('Selected product:', 'pearl')}</p>
+                                {selectedProduct && (
+                                    <p style={{fontWeight: 'bold', fontSize: 'large'}}>{selectedProduct.brand} {selectedProduct.name}</p>
+                                )}
+                                {!selectedProduct && (
+                                    <p style={{fontWeight: 'bold', fontSize: 'large'}}>{__('Product with ID', 'pearl')} {productId}</p>
+                                )}
                             </>
-                        ) }
+                        )}
                         <SelectControl
                             __nextHasNoMarginBottom
                             __next40pxDefaultSize
-                            label={ __('Categorie', 'pearl') }
-                            value={ category }
-                            options={ [
-                                { label: 'Smartphones', value: 'Smartphones' },
-                                { label: 'Smartwatches', value: 'Smartwatches' },
-                                { label: 'PCs', value: 'PCs' },
-                                { label: 'Laptops', value: 'Laptops' },
-                                { label: 'Mediaspelers', value: 'Mediaspelers' },
-                                { label: 'Mp3', value: 'Mp3' },
-                                { label: 'Oordopjes', value: 'Oordopjes' },
-                                { label: 'Tablets', value: 'Tablets' },
-                            ] }
-                            onChange={ function(value) {
+                            label={__('Category', 'pearl')}
+                            value={category}
+                            options={[
+                                {label: __('Smartphones', 'pearl'), value: 'Smartphones'},
+                                {label: __('Smartwatches', 'pearl'), value: 'Smartwatches'},
+                                {label: __('PCs', 'pearl'), value: 'PCs'},
+                                {label: __('Laptops', 'pearl'), value: 'Laptops'},
+                                {label: __('Mediaplayers', 'pearl'), value: 'Mediaspelers'},
+                                {label: __('Mp3', 'pearl'), value: 'Mp3'},
+                                {label: __('Earplugs', 'pearl'), value: 'Oordopjes'},
+                                {label: __('Tablets', 'pearl'), value: 'Tablets'},
+                            ]}
+                            onChange={function(value) {
                                 setCategory(value);
                                 setProducts([]);
                                 if (value !== 'Smartphones') {
-                                    setAttributes({ offerType: 'product' })
+                                    setAttributes({offerType: 'product'})
                                 }
-                            } }
+                            }}
                         />
-                        { category === 'Smartphones' && (
+                        {category === 'Smartphones' && (
                             <>
                                 <RadioControl
                                     __nextHasNoMarginBottom
                                     __next40pxDefaultSize
-                                    label={ __('Offer type', 'pearl') }
-                                    selected={ offerType }
-                                    options={ [
-                                        { label: 'Product', value: 'product' },
-                                        { label: 'Package', value: 'package' },
-                                    ] }
-                                    onChange={ (value) => setAttributes({ offerType: value }) }
+                                    label={__('Offer type', 'pearl')}
+                                    selected={offerType}
+                                    options={[
+                                        {label: 'Product', value: 'product'},
+                                        {label: 'Package', value: 'package'},
+                                    ]}
+                                    onChange={(value) => setAttributes({offerType: value})}
                                 />
                                 <ToggleControl
                                     __nextHasNoMarginBottom
                                     __next40pxDefaultSize
-                                    checked={ !!showOfferTypeSelector }
-                                    label={ __('Maak het mogelijk om te switchen van offer type?', 'pearl') }
-                                    onChange={ () => setAttributes({ showOfferTypeSelector: !showOfferTypeSelector })
+                                    checked={!!showOfferTypeSelector}
+                                    label={__('Make it possible to switch between offer types?', 'pearl')}
+                                    onChange={() => setAttributes({showOfferTypeSelector: !showOfferTypeSelector})
                                     }
                                 />
                             </>
-                        ) }
+                        )}
                         <TextControl
                             __nextHasNoMarginBottom
                             __next40pxDefaultSize
-                            label={ __('Zoek naar product', 'pearl') }
-                            value={ search }
-                            onChange={ (value) => setSearch(value) }
+                            label={__('Search a product', 'pearl')}
+                            value={search}
+                            onChange={(value) => setSearch(value)}
                         />
-                        { isOpen && (
+                        {isOpen && (
                             <ul>
-                                { loading && (<li>Producten laden</li>) }
-                                { !loading && (
+                                {loading && (<li>Producten laden</li>)}
+                                {!loading && (
                                     products.map((product) =>
-                                        <li key={ product.id }>
+                                        <li key={product.id}>
                                             <Button
                                                 __next40pxDefaultSize
                                                 variant='secondary'
-                                                style={ { width: '100%', textAlign: 'left' } }
-                                                onClick={ () => {
+                                                style={{width: '100%', textAlign: 'left'}}
+                                                onClick={() => {
                                                     setSelectedProduct(product);
                                                     setIsOpen(false);
-                                                } }
-                                            >{ product.brand } { product.name }</Button>
+                                                }}
+                                            >{product.brand} {product.name}</Button>
                                         </li>
                                     )
-                                ) }
+                                )}
                             </ul>
-                        ) }
+                        )}
                     </PanelBody>
                 </InspectorControls>
     
-                { !productId && (
-                    <p { ...useBlockProps() }>{ __('Zoek en selecteer een product om een preview te zien', 'pearl') }</p>
-                ) }
-                { productId && (
-                    <div { ...useBlockProps() }>
-                        <p>{ __('Preview:', 'pearl') }</p>
+                {!productId && (
+                    <p {...useBlockProps()}>{__('Search and select a product to see a preview', 'pearl')}</p>
+                )}
+                {productId && (
+                    <div {...useBlockProps()}>
+                        <p>{__('Preview:', 'pearl')}</p>
                         <script src='https://wl.bigspark.link/assets/resize-iframe.js'></script>
                         <iframe
-                            id={ widgetId }
+                            id={widgetId}
                             loading="lazy"
                             referrerpolicy="no-referrer-when-downgrade"
                             class="bs-widget"
-                            style={ { border: "none" } }
-                            src={ iframeUrl }
+                            style={{border: "none"}}
+                            src={iframeUrl}
                             width="100%"
                             height="750"
                         />
                     </div>
-                ) }
+                )}
             </>
         );
     },
 
     // The save function stores the HTML in the database as backup. The primary way the content is shown is through render.php.
-    save: function Edit({ attributes }) {
-        const { productId, offerType, showOfferTypeSelector, widgetId } = attributes;
+    save: function Edit({attributes}) {
+        const {productId, offerType, showOfferTypeSelector, widgetId} = attributes;
 
         const iframeUrl = buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId);
 
         return (
-            <div { ...useBlockProps.save() }>
+            <div {...useBlockProps.save()}>
                 <script src='https://wl.bigspark.link/assets/resize-iframe.js'></script>
                 <iframe
-                    id={ widgetId }
+                    id={widgetId}
                     loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade"
                     class="bs-widget"
-                    style={ { border: "none" } }
-                    src={ iframeUrl }
+                    style={{border: "none"}}
+                    src={iframeUrl}
                     width="100%"
                     height="750"
                 />
