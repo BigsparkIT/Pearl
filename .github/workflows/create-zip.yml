@@ -25,8 +25,11 @@ jobs:
     - name: Unzip the archive (prevents double zip problem)
       run: unzip wp-content/plugins/pearl/pearl.zip -d zipfile
 
-    - name: Upload release zip
-      uses: actions/upload-artifact@v4
-      with:
-        name: BigSpark-Pearl
-        path: zipfile
+    - name: Install GitHub CLI
+      run: sudo apt-get install -y gh
+
+    - name: Update Release
+      run: |
+        gh release upload "${{ github.event.release.tag_name }}" wp-content/plugins/pearl/pearl.zip --clobber
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
