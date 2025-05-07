@@ -8,28 +8,57 @@ jobs:
   build:
     name: Build release zip
     runs-on: ubuntu-latest
+
+    env:
+      TAG_NAME: ${{ github.event.release.tag_name }}
+      REPO:     ${{ github.repository }}
+
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
     - name: Setup Node
       uses: actions/setup-node@v4
 
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Build Zip
+    - name: Build Pearl
       working-directory: wp-content/plugins/pearl
       run: |
         npm install
         npm run build
         npm run plugin-zip
 
-    - name: Unzip the archive (prevents double zip problem)
-      run: unzip wp-content/plugins/pearl/pearl.zip -d zipfile
-
-    - name: Install GitHub CLI
-      run: sudo apt-get install -y gh
-
-    - name: Update Release
+    - name: Update composer.json dist info
+      working-directory: wp-content/plugins/pearl
       run: |
-        gh release upload "${{ github.event.release.tag_name }}" wp-content/plugins/pearl/pearl.zip --clobber
+        # strip 'v' for semver-version
+        VERSION=${TAG_NAME#v}
+
+        # write new json
+        jq --arg v "$VERSION" \
+             --arg url "https://github.com/$REPO/releases/download/$TAG_NAME/pearl.zip" \
+             '
+               .version = $v
+               | .dist = {type:"zip",url:$url}
+             ' composer.json > composer.json.tmp
+
+          mv composer.json.tmp composer.json
+
+    - name: Commit dist metadata in tag
+      run: |
+        git config --local user.name "GitHub Actions"
+        git config --local user.email "[email protected]"
+
+        git add wp-content/plugins/pearl/composer.json
+        git commit -m "🔖  Add build assets & dist metadata for $TAG_NAME"
+
+        git tag -f "$TAG_NAME" -m "Release $TAG_NAME (with assets & dist metadata)"
+
+        git push --force origin "$TAG_NAME"
+
+    - name: Upload pearl.zip to release
+      run: |
+        gh release upload "$TAG_NAME" wp-content/plugins/pearl/pearl.zip --clobber
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

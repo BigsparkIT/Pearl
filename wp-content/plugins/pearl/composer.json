@@ -1,0 +1,16 @@
+{
+  "name": "bigsparkit/pearl",
+  "description": "Adds a Gutenberg block to create an in-article-widget.",
+  "type": "wordpress-plugin",
+  "version": "0.1.0",
+  "dist": {
+    "type": "zip",
+    "url": "https://github.com/bigsparkit/pearl/releases/download/v0.1.0/pearl.zip"
+  },
+  "require": {
+    "php": ">=8.2"
+  },
+  "extra": {
+    "installer-name": "pearl"
+  }
+}
