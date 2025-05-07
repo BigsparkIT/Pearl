@@ -13,6 +13,7 @@
 
 # Ignore everything in the root except the "wp-content" directory.
 /*
+!composer.json
 !.gitignore
 !.github/
 !docker-compose.yml

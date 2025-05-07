@@ -30,7 +30,6 @@ jobs:
         npm run plugin-zip
 
     - name: Update composer.json dist info
-      working-directory: wp-content/plugins/pearl
       run: |
         # strip 'v' for semver-version
         VERSION=${TAG_NAME#v}
@@ -50,7 +49,7 @@ jobs:
         git config --local user.name "GitHub Actions"
         git config --local user.email "[email protected]"
 
-        git add wp-content/plugins/pearl/composer.json
+        git add composer.json
         git commit -m "🔖  Add build assets & dist metadata for $TAG_NAME"
 
         git tag -f "$TAG_NAME" -m "Release $TAG_NAME (with assets & dist metadata)"
