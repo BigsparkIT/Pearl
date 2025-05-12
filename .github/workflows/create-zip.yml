@@ -12,6 +12,9 @@ jobs:
     env:
       TAG_NAME: ${{ github.event.release.tag_name }}
       REPO:     ${{ github.repository }}
+      S3_BUCKET: composer-packages
+      S3_BASE_URL: https://t56v2.upcloudobjects.com
+      S3_PREFIX: composer-repo
 
     steps:
     - name: Checkout
@@ -36,13 +39,88 @@ jobs:
 
         # write new json
         jq --arg v "$VERSION" \
-             --arg url "https://github.com/$REPO/releases/download/$TAG_NAME/pearl.zip" \
-             '
-               .version = $v
-               | .dist = {type:"zip",url:$url}
-             ' composer.json > composer.json.tmp
+           --arg url "$S3_BASE_URL/$S3_BUCKET/$S3_PREFIX/p/bigsparkit/pearl/$VERSION/pearl-$VERSION.zip" \
+           '
+             .version = $v
+             | .dist = {type:"zip",url:$url}
+             | del(.config)
+             | del(.repositories)
+           ' composer.json > composer.json.tmp
 
-          mv composer.json.tmp composer.json
+        mv composer.json.tmp composer.json
+
+    - name: Setup AWS CLI v2
+      run: |
+        # Verwijder AWS CLI v1 indien geïnstalleerd
+        pip uninstall -y awscli || true
+
+        # Download en installeer AWS CLI v2
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        unzip awscliv2.zip
+        sudo ./aws/install --update
+
+        # Configureer AWS CLI v2
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set region eu-west-1
+        aws configure set default.s3.endpoint_url ${{ env.S3_BASE_URL }}
+
+        # Print versie en configuratie voor debugging
+        echo "AWS CLI version:"
+        aws --version
+        echo "AWS CLI configuration:"
+        aws configure list
+
+    - name: Upload to S3
+      run: |
+        # strip 'v' for semver-version
+        VERSION=${TAG_NAME#v}
+
+        # Create directory structure
+        mkdir -p "p/bigsparkit/pearl/$VERSION"
+
+        # Copy composer.json to S3 folder structure
+        cp composer.json "p/bigsparkit/pearl/$VERSION/"
+
+        # Copy zip to S3 folder structure and rename
+        cp wp-content/plugins/pearl/pearl.zip "p/bigsparkit/pearl/$VERSION/pearl-$VERSION.zip"
+
+        # Upload files to S3
+        aws s3 cp "p/bigsparkit/pearl/$VERSION" "s3://$S3_BUCKET/$S3_PREFIX/p/bigsparkit/pearl/$VERSION" --recursive --endpoint-url $S3_BASE_URL
+
+    - name: Update packages.json
+      run: |
+        # strip 'v' for semver-version
+        VERSION=${TAG_NAME#v}
+
+        # Download current packages.json if it exists
+        aws s3 cp "s3://$S3_BUCKET/$S3_PREFIX/packages.json" packages.json --endpoint-url $S3_BASE_URL --no-sign-request || echo '{"packages":{}}' > packages.json
+
+        # Update packages.json with new version
+        jq --arg v "$VERSION" \
+           --arg url "$S3_BASE_URL/$S3_BUCKET/$S3_PREFIX/p/bigsparkit/pearl/$VERSION/pearl-$VERSION.zip" \
+           '
+           .packages."bigsparkit/pearl"[$v] = {
+             "name": "bigsparkit/pearl",
+             "version": $v,
+             "type": "wordpress-plugin",
+             "dist": {
+               "type": "zip",
+               "url": $url
+             },
+             "require": {
+               "php": ">=8.2"
+             },
+             "extra": {
+               "installer-name": "pearl"
+             }
+           }
+           ' packages.json > packages.json.tmp
+
+        mv packages.json.tmp packages.json
+
+        # Upload updated packages.json to S3
+        aws s3 cp packages.json "s3://$S3_BUCKET/$S3_PREFIX/packages.json" --endpoint-url $S3_BASE_URL --no-sign-request
 
     - name: Commit dist metadata in tag
       run: |
@@ -56,7 +134,7 @@ jobs:
 
         git push --force origin "$TAG_NAME"
 
-    - name: Upload pearl.zip to release
+    - name: Upload pearl.zip to GitHub release
       run: |
         gh release upload "$TAG_NAME" wp-content/plugins/pearl/pearl.zip --clobber
       env:
