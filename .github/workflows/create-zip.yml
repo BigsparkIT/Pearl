@@ -49,52 +49,44 @@ jobs:
 
         mv composer.json.tmp composer.json
 
-    - name: Setup AWS CLI v2
+    - name: Install rclone
       run: |
-        # Verwijder AWS CLI v1 indien geïnstalleerd
-        pip uninstall -y awscli || true
+        curl https://rclone.org/install.sh | sudo bash
 
-        # Download en installeer AWS CLI v2
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip awscliv2.zip
-        sudo ./aws/install --update
+        # Configureer rclone voor UpCloud
+        mkdir -p ~/.config/rclone
+        cat > ~/.config/rclone/rclone.conf << EOF
+        [upcloud]
+        type = s3
+        provider = Other
+        access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}
+        secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        endpoint = ${{ env.S3_BASE_URL }}
+        EOF
 
-        # Configureer AWS CLI v2
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws configure set region eu-west-1
-        aws configure set default.s3.endpoint_url ${{ env.S3_BASE_URL }}
-
-        # Print versie en configuratie voor debugging
-        echo "AWS CLI version:"
-        aws --version
-        echo "AWS CLI configuration:"
-        aws configure list
-
-    - name: Upload to S3
+    - name: Upload to S3 using rclone
       run: |
-        # strip 'v' for semver-version
         VERSION=${TAG_NAME#v}
 
-        # Create directory structure
+        # Create directories
         mkdir -p "p/bigsparkit/pearl/$VERSION"
-
-        # Copy composer.json to S3 folder structure
         cp composer.json "p/bigsparkit/pearl/$VERSION/"
-
-        # Copy zip to S3 folder structure and rename
         cp wp-content/plugins/pearl/pearl.zip "p/bigsparkit/pearl/$VERSION/pearl-$VERSION.zip"
 
-        # Upload files to S3
-        aws s3 cp "p/bigsparkit/pearl/$VERSION" "s3://$S3_BUCKET/$S3_PREFIX/p/bigsparkit/pearl/$VERSION" --recursive --endpoint-url $S3_BASE_URL
+        # Upload to S3
+        rclone copy "p/bigsparkit/pearl/$VERSION" upcloud:$S3_BUCKET/$S3_PREFIX/p/bigsparkit/pearl/$VERSION --progress
 
-    - name: Update packages.json
-      run: |
-        # strip 'v' for semver-version
-        VERSION=${TAG_NAME#v}
-
-        # Download current packages.json if it exists
-        aws s3 cp "s3://$S3_BUCKET/$S3_PREFIX/packages.json" packages.json --endpoint-url $S3_BASE_URL --no-sign-request || echo '{"packages":{}}' > packages.json
+        # Download packages.json - alternatieve aanpak
+        echo "Checking if packages.json exists on S3..."
+        if rclone cat upcloud:$S3_BUCKET/$S3_PREFIX/packages.json > packages.json 2>/dev/null; then
+          echo "Found and downloaded packages.json. File size:"
+          ls -la packages.json
+        else
+          echo "packages.json not found on S3, creating empty file..."
+          echo '{"packages":{}}' > packages.json
+          echo "Empty packages.json created. File size:"
+          ls -la packages.json
+        fi
 
         # Update packages.json with new version
         jq --arg v "$VERSION" \
@@ -120,7 +112,7 @@ jobs:
         mv packages.json.tmp packages.json
 
         # Upload updated packages.json to S3
-        aws s3 cp packages.json "s3://$S3_BUCKET/$S3_PREFIX/packages.json" --endpoint-url $S3_BASE_URL --no-sign-request
+        rclone copy packages.json upcloud:$S3_BUCKET/$S3_PREFIX/packages.json
 
     - name: Commit dist metadata in tag
       run: |
