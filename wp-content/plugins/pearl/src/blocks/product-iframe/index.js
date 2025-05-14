@@ -33,7 +33,11 @@ function buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId) {
 registerBlockType(metadata.name, {
     edit: function Edit({attributes, setAttributes}) {
         const {productId, offerType, showOfferTypeSelector, widgetId} = attributes;
-        setAttributes({widgetId: generatedId});
+        useEffect(() => {
+          if (!widgetId) {
+            setAttributes({widgetId: generatedId});
+          }
+        }, []);
 
         const [category, setCategory] = useState('Smartphones');
         const [search, setSearch] = useState('');
@@ -62,7 +66,7 @@ registerBlockType(metadata.name, {
         }, [selectedProduct]);
 
         const iframeUrl = buildIframeUrl(productId, offerType, showOfferTypeSelector, widgetId);
-    
+
         return (
             <>
                 <InspectorControls>
@@ -153,7 +157,7 @@ registerBlockType(metadata.name, {
                         )}
                     </PanelBody>
                 </InspectorControls>
-    
+
                 {!productId && (
                     <p {...useBlockProps()}>{__('Search and select a product to see a preview', 'pearl')}</p>
                 )}
@@ -164,8 +168,8 @@ registerBlockType(metadata.name, {
                         <iframe
                             id={widgetId}
                             loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                            class="bs-widget"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            className="bs-widget"
                             style={{border: "none"}}
                             src={iframeUrl}
                             width="100%"
@@ -189,8 +193,8 @@ registerBlockType(metadata.name, {
                 <iframe
                     id={widgetId}
                     loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                    class="bs-widget"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="bs-widget"
                     style={{border: "none"}}
                     src={iframeUrl}
                     width="100%"

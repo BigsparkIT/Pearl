@@ -13,8 +13,18 @@ if (! defined('ABSPATH')) {
     exit;
 }
 
+// Load required files
+require_once plugin_dir_path(__FILE__) . 'includes/class-utils.php';
+
 add_action('init', function () {
-    register_block_type(__DIR__ . '/build/blocks/product-iframe');
+    register_block_type(
+        __DIR__ . '/build/blocks/product-iframe',
+        [
+            'render_callback' => function ($attributes) {
+                return \Pearl\Utils::renderProductIframe($attributes);
+            },
+        ]
+    );
 });
 
 // Only load the settings page and inject the platform name in the admin environment.
